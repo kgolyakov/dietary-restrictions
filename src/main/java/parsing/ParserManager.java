@@ -17,6 +17,7 @@ public class ParserManager {
 
     public Map<String, List<String>> analyseImage(BufferedImage input) {
         String recognize = textRecognizer.recognize(input);
+        System.out.println("DBG recognized text:" + recognize);
         List<String> entities = entityRecognizer.createEntities(recognize);
         Map<String, List<String>> analysis = analysisManager.analysis(entities);
         return analysis;
