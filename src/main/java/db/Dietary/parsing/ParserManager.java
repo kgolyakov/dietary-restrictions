@@ -1,10 +1,10 @@
-package parsing;
+package db.Dietary.parsing;
 
-import analysing.AnalysisManager;
-import parsing.services.EntityRecognizer;
-import parsing.services.EntityRecognizerImpl;
-import parsing.services.TextRecognizer;
-import parsing.services.TextRecognizerImpl;
+import db.Dietary.analysing.AnalysisManager;
+import db.Dietary.parsing.services.EntityRecognizer;
+import db.Dietary.parsing.services.EntityRecognizerImpl;
+import db.Dietary.parsing.services.TextRecognizer;
+import db.Dietary.parsing.services.TextRecognizerImpl;
 
 import java.awt.image.BufferedImage;
 import java.util.List;

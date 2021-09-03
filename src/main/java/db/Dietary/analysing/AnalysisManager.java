@@ -1,7 +1,7 @@
-package analysing;
+package db.Dietary.analysing;
 
-import analysing.services.Analyser;
-import analysing.services.AnalyserImpl;
+import db.Dietary.analysing.services.Analyser;
+import db.Dietary.analysing.services.AnalyserImpl;
 
 import java.util.List;
 import java.util.Map;

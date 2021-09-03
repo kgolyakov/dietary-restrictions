@@ -1,6 +1,5 @@
-package parsing.services;
+package db.Dietary.parsing.services;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public interface TextRecognizer {

@@ -1,4 +1,4 @@
-package analysing.services;
+package db.Dietary.analysing.services;
 
 import java.util.HashMap;
 import java.util.List;

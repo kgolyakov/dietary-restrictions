@@ -1,4 +1,4 @@
-package controllers;
+package db.Dietary.controllers;
 
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
