@@ -1,9 +1,6 @@
 package analysing.services;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 public class AnalyserImpl implements Analyser {
     @Override
@@ -14,14 +11,14 @@ public class AnalyserImpl implements Analyser {
                 if (result.containsKey("Meat")) {
                     result.get("Meat").add(ingredient);
                 } else {
-                    result.put("Meat", List.of(ingredient));
+                    result.put("Meat", new ArrayList<>(List.of(ingredient)));
                 }
             }
             if (ingredient.toLowerCase(Locale.ROOT).contains("кофе")) {
                 if (result.containsKey("Coffee")) {
                     result.get("Coffee").add(ingredient);
                 } else {
-                    result.put("Coffee", List.of(ingredient));
+                    result.put("Coffee", new ArrayList<>(List.of(ingredient)));
                 }
             }
         }
