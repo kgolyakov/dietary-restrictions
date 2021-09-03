@@ -1,0 +1,5 @@
+# Project exclude paths
+/target/
+pom.xml
+dietary-restrictions.iml
+.idea
