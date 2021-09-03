@@ -40,7 +40,7 @@ public class Main {
                 URL url = new URL(fullPath);
                 BufferedImage img = ImageIO.read(url);
                 bot.execute(new SendMessage(chatId, "Analyzing image..."));
-                Map<String, List<String>> strings = parserManager.analyseImage(img);
+                Map<String, List<String>> strings = parserManager.analyseImage(bot, chatId, img);
                 bot.execute(new SendMessage(chatId, strings.toString()));
             }
         }
