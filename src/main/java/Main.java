@@ -1,49 +1,26 @@
 import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.UpdatesListener;
-import com.pengrad.telegrambot.model.Document;
-import com.pengrad.telegrambot.model.File;
-import com.pengrad.telegrambot.model.PhotoSize;
-import com.pengrad.telegrambot.model.Update;
-import com.pengrad.telegrambot.request.GetFile;
-import com.pengrad.telegrambot.request.SendMessage;
-import com.pengrad.telegrambot.response.GetFileResponse;
-import lombok.SneakyThrows;
+import org.telegram.telegrambots.ApiContextInitializer;
+import org.telegram.telegrambots.meta.TelegramBotsApi;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 import parsing.ParserManager;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.net.URL;
-import java.util.List;
-import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
+        /*TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
         TelegramBot bot = new TelegramBot("1973421485:AAHuiDhX63Z42vAxsLTd2WR3N4V3LQftjL4");
         ParserManager parserManager = new ParserManager();
+        System.out.println("Hello");
         bot.setUpdatesListener(updates -> {
             return processUpdate(bot, parserManager, updates);
-        });
-    }
-    @SneakyThrows
-    private static int processUpdate(TelegramBot bot, ParserManager parserManager, List<Update> updates) {
-        // ... process updates
-        // return id of last processed update or confirm them all
-        for(Update upd : updates) {
-            long chatId = upd.message().chat().id();
-            if(upd.message().document() != null) {
-                Document document = upd.message().document();
-                GetFile request = new GetFile(document.fileId());
-                GetFileResponse getFileResponse = bot.execute(request);
-                File file = getFileResponse.file();
-                String fullPath = bot.getFullFilePath(file);
-                System.out.println(fullPath);
-                URL url = new URL(fullPath);
-                BufferedImage img = ImageIO.read(url);
-                bot.execute(new SendMessage(chatId, "Analyzing image..."));
-                Map<String, List<String>> strings = parserManager.analyseImage(bot, chatId, img);
-                bot.execute(new SendMessage(chatId, strings.toString()));
-            }
+        });*/
+        ApiContextInitializer.init();
+        TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
+        try {
+            telegramBotsApi.registerBot(new telegrambotUI.TelegramBot());
+        } catch (TelegramApiRequestException e) {
+            e.printStackTrace();
         }
-        return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
+
 }
