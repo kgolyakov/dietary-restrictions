@@ -1,8 +1,6 @@
 package parsing;
 
 import analysing.AnalysisManager;
-import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.request.SendMessage;
 import lombok.SneakyThrows;
 import parsing.services.EntityRecognizer;
 import parsing.services.EntityRecognizerImpl;
@@ -19,7 +17,7 @@ public class ParserManager {
     private AnalysisManager analysisManager = new AnalysisManager();
 
     @SneakyThrows
-    public Map<String, List<String>> analyseImage(telegrambotUI.TelegramBot bot, long chatId, BufferedImage input) {
+    public Map<String, List<String>> analyseImage(telegrambotUI.TelegramBot bot, String chatId, BufferedImage input) {
         String recognize = textRecognizer.recognize(input);
         System.out.println("DBG recognized text:" + recognize);
         bot.execute(bot.sendInlineKeyBoardMessage(chatId, List.of("чай", "кофе")));

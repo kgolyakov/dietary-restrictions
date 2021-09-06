@@ -2,7 +2,6 @@ package telegrambotUI;
 
 import lombok.SneakyThrows;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.meta.api.methods.GetFile;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
@@ -26,7 +25,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     @SneakyThrows
     @Override
     public void onUpdateReceived(Update update) {
-        long chatId = update.getMessage().getChatId();
+        String chatId = update.getMessage().getChatId().toString();
         if (update.hasMessage() && update.getMessage().hasPhoto()) {
             long chat_id = update.getMessage().getChatId();
 
@@ -56,10 +55,7 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     public String getFilePath(PhotoSize photo) {
         Objects.requireNonNull(photo);
-
-        if (photo.hasFilePath()) { // If the file_path is already present, we are done!
-            return photo.getFilePath();
-        } else { // If not, let find it
+{ // If not, let find it
             // We create a GetFile method and set the file_id from the photo
             GetFile getFileMethod = new GetFile();
             getFileMethod.setFileId(photo.getFileId());
@@ -95,19 +91,24 @@ public class TelegramBot extends TelegramLongPollingBot {
         return token;
     }
 
-    public static SendMessage sendInlineKeyBoardMessage(long chatId, List<String> ingredientsInfo) {
+    public static SendMessage sendInlineKeyBoardMessage(String chatId, List<String> ingredientsInfo) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<InlineKeyboardButton> keyboardButtonsRow1 = new ArrayList<>();
         for (String ingredient : ingredientsInfo) {
-            keyboardButtonsRow1.add(new InlineKeyboardButton().setText(ingredient).setCallbackData("button pressed"));
+            InlineKeyboardButton temp = new InlineKeyboardButton();
+            temp.setText(ingredient);
+            temp.setCallbackData("button pressed");
+            keyboardButtonsRow1.add(temp);
         }
-        List<InlineKeyboardButton> keyboardButtonsRow2 = new ArrayList<>();
 
-        keyboardButtonsRow1.add(new InlineKeyboardButton().setText("Fi4a").setCallbackData("CallFi4a"));
         List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
         rowList.add(keyboardButtonsRow1);
-        rowList.add(keyboardButtonsRow2);
+
         inlineKeyboardMarkup.setKeyboard(rowList);
-        return new SendMessage().setChatId(chatId).setText("Пример фото").setReplyMarkup(inlineKeyboardMarkup);
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText("hello");
+        sendMessage.setReplyMarkup(inlineKeyboardMarkup);
+        return sendMessage;
     }
 }
