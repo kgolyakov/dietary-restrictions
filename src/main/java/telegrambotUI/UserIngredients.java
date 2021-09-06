@@ -20,10 +20,10 @@ public class UserIngredients {
         if (entities.contains(incorrectProduct)){
             int index = entities.indexOf(incorrectProduct);
             System.out.println(index);
-            //entities.set(index, correctProduct);
-            List<String> temp = new ArrayList<String>(entities);
-            temp.set(index, correctProduct);
-            entities = temp;
+            entities.set(index, correctProduct);
+            //List<String> temp = new ArrayList<String>(entities);
+            //temp.set(index, correctProduct);
+            //entities = temp;
         }
     }
 }
