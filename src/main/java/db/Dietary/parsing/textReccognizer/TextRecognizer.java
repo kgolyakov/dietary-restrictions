@@ -1,4 +1,4 @@
-package db.Dietary.parsing.services;
+package db.Dietary.parsing.textReccognizer;
 
 import java.awt.image.BufferedImage;
 
