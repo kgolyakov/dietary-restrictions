@@ -1,4 +1,7 @@
-package parsing.services;
+package db.Dietary.parsing.textReccognizer;
+
+import db.Dietary.parsing.textReccognizer.TextRecognizer;
+import org.springframework.stereotype.Service;
 
 import lombok.SneakyThrows;
 import net.sourceforge.tess4j.Tesseract;
@@ -10,6 +13,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+@Service
 public class TextRecognizerImpl implements TextRecognizer {
     @Override
     @SneakyThrows
