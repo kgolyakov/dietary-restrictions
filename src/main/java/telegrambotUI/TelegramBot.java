@@ -17,66 +17,74 @@ import java.awt.image.BufferedImage;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class TelegramBot extends TelegramLongPollingBot {
     private static final String botUserName = "JavaSchoolTestBot";
     private static final String token = "1993202006:AAFrRNzZwWHn7HeSF8Pp-4DdBr9MfucZFss";
-    private ParserManager parserManager;
+    private ParserManager parserManager = new ParserManager();
     @SneakyThrows
     @Override
     public void onUpdateReceived(Update update) {
         long chatId = update.getMessage().getChatId();
         if (update.hasMessage() && update.getMessage().hasPhoto()) {
-            // Message contains photo
-            // Set variables
             long chat_id = update.getMessage().getChatId();
 
-            // Array with photo objects with different sizes
-            // We will get the biggest photo from that array
+            java.io.File file = downloadPhotoByFilePath(getFilePath(getPhoto(update)));
+
+            BufferedImage img = ImageIO.read(file);
+            execute(new SendMessage(chatId, "Analyzing image..."));
+            Map<String, List<String>> strings = parserManager.analyseImage(this, chatId, img);
+
+        }
+    }
+
+    public PhotoSize getPhoto(Update update) {
+        // Check that the update contains a message and the message has a photo
+        if (update.hasMessage() && update.getMessage().hasPhoto()) {
+            // When receiving a photo, you usually get different sizes of it
             List<PhotoSize> photos = update.getMessage().getPhoto();
-            // Know file_id
 
-            String f_id = photos.stream()
-                    .sorted(Comparator.comparing(PhotoSize::getFileSize).reversed())
-                    .findFirst()
-                    .orElse(null).getFileId();
-            // Know photo width
-            int f_width = photos.stream()
-                    .sorted(Comparator.comparing(PhotoSize::getFileSize).reversed())
-                    .findFirst()
-                    .orElse(null).getWidth();
-            // Know photo height
-            int f_height = photos.stream()
-                    .sorted(Comparator.comparing(PhotoSize::getFileSize).reversed())
-                    .findFirst()
-                    .orElse(null).getHeight();
-            // Set photo caption
-            System.out.println(f_id);
-            URL url = new URL(f_id);
-            //BufferedImage img = ImageIO.read(url);
-            //execute(new SendMessage(chatId, "Analyzing image..."));
-            //Map<String, List<String>> strings = parserManager.analyseImage(this, chatId, img);
-            String caption = "file_id: " + f_id + "\nwidth: " + Integer.toString(f_width) + "\nheight: " + Integer.toString(f_height);
-            SendPhoto msg = new SendPhoto()
-                    .setChatId(chat_id)
-                    .setPhoto(f_id)
-                    .setCaption(caption);
-            InputFile photo = msg.getPhoto();
+            // We fetch the bigger photo
+            return photos.stream()
+                    .max(Comparator.comparing(PhotoSize::getFileSize)).orElse(null);
+        }
 
+        // Return null if not found
+        return null;
+    }
+
+    public String getFilePath(PhotoSize photo) {
+        Objects.requireNonNull(photo);
+
+        if (photo.hasFilePath()) { // If the file_path is already present, we are done!
+            return photo.getFilePath();
+        } else { // If not, let find it
+            // We create a GetFile method and set the file_id from the photo
+            GetFile getFileMethod = new GetFile();
+            getFileMethod.setFileId(photo.getFileId());
             try {
-                execute(msg); // Call method to send the photo with caption
+                // We execute the method using AbsSender::execute method.
+                File file = execute(getFileMethod);
+                // We now have the file_path
+                return file.getFilePath();
             } catch (TelegramApiException e) {
                 e.printStackTrace();
             }
         }
+
+        return null; // Just in case
     }
+    public java.io.File downloadPhotoByFilePath(String filePath) {
+        try {
+            // Download the file calling AbsSender::downloadFile method
+            return downloadFile(filePath);
+        } catch (TelegramApiException e) {
+            e.printStackTrace();
+        }
 
-
-
+        return null;
+    }
     @Override
     public String getBotUsername() {
         return botUserName;
@@ -87,23 +95,19 @@ public class TelegramBot extends TelegramLongPollingBot {
         return token;
     }
 
-    public static SendMessage sendInlineKeyBoardMessage(long chatId) {
+    public static SendMessage sendInlineKeyBoardMessage(long chatId, List<String> ingredientsInfo) {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        InlineKeyboardButton inlineKeyboardButton1 = new InlineKeyboardButton();
-        InlineKeyboardButton inlineKeyboardButton2 = new InlineKeyboardButton();
-        inlineKeyboardButton1.setText("Тык");
-        inlineKeyboardButton1.setCallbackData("Button \"Тык\" has been pressed");
-        inlineKeyboardButton2.setText("Тык2");
-        inlineKeyboardButton2.setCallbackData("Button \"Тык2\" has been pressed");
         List<InlineKeyboardButton> keyboardButtonsRow1 = new ArrayList<>();
+        for (String ingredient : ingredientsInfo) {
+            keyboardButtonsRow1.add(new InlineKeyboardButton().setText(ingredient).setCallbackData("button pressed"));
+        }
         List<InlineKeyboardButton> keyboardButtonsRow2 = new ArrayList<>();
-        keyboardButtonsRow1.add(inlineKeyboardButton1);
+
         keyboardButtonsRow1.add(new InlineKeyboardButton().setText("Fi4a").setCallbackData("CallFi4a"));
-        keyboardButtonsRow2.add(inlineKeyboardButton2);
         List<List<InlineKeyboardButton>> rowList = new ArrayList<>();
         rowList.add(keyboardButtonsRow1);
         rowList.add(keyboardButtonsRow2);
         inlineKeyboardMarkup.setKeyboard(rowList);
-        return new SendMessage().setChatId(chatId).setText("Пример").setReplyMarkup(inlineKeyboardMarkup);
+        return new SendMessage().setChatId(chatId).setText("Пример фото").setReplyMarkup(inlineKeyboardMarkup);
     }
 }

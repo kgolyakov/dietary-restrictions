@@ -22,7 +22,7 @@ public class ParserManager {
     public Map<String, List<String>> analyseImage(telegrambotUI.TelegramBot bot, long chatId, BufferedImage input) {
         String recognize = textRecognizer.recognize(input);
         System.out.println("DBG recognized text:" + recognize);
-        bot.execute(new org.telegram.telegrambots.meta.api.methods.send.SendMessage(chatId, "Recognized text:" + recognize));
+        bot.execute(bot.sendInlineKeyBoardMessage(chatId, List.of("чай", "кофе")));
         List<String> entities = entityRecognizer.createEntities(recognize);
         Map<String, List<String>> analysis = analysisManager.analysis(entities);
         return analysis;
