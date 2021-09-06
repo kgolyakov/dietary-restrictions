@@ -1,6 +1,10 @@
 package telegrambotUI;
 
+import db.Dietary.Ingredient.Ingredient;
+import db.Dietary.Ingredient.IngredientImp;
+import db.Dietary.parsing.ParserManager;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.GetFile;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -8,7 +12,7 @@ import org.telegram.telegrambots.meta.api.objects.*;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import parsing.ParserManager;
+//import parsing.ParserManager;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -17,12 +21,14 @@ import java.util.*;
 public class TelegramBot extends TelegramLongPollingBot {
     private static final String botUserName = "JavaSchoolTestBot";
     private static final String token = "1993202006:AAFrRNzZwWHn7HeSF8Pp-4DdBr9MfucZFss";
-    private ParserManager parserManager = new ParserManager();
+    @Autowired
+    private ParserManager parserManager;
     private List<UserIngredients> users = new ArrayList<UserIngredients>();
     @SneakyThrows
     @Override
     public void onUpdateReceived(Update update) {
 
+        System.out.println("ping");
         if (update.hasMessage() && update.getMessage().hasPhoto()) {
             String chatId = update.getMessage().getChatId().toString();
             users.add(new UserIngredients(chatId));
@@ -31,7 +37,10 @@ public class TelegramBot extends TelegramLongPollingBot {
 
             BufferedImage img = ImageIO.read(file);
             execute(new SendMessage(chatId, "Analyzing image..."));
-            Map<String, List<String>> strings = parserManager.analyseImage(this, chatId, img);
+
+
+            List<Ingredient> ingredientsFromImage = parserManager.getIngredientsFromImage(img);
+            this.execute(this.sendInlineKeyBoardMessage(chatId, ingredientsFromImage));
 
         }
         if(update.hasCallbackQuery()){
@@ -48,7 +57,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                 for (UserIngredients user : users){
                     if (user.getChatId().equals(chatId)){
 
-                        user.fixIngredient(textList.get(1));
+                        user.fixIngredient(new IngredientImp(textList.get(1)));
                         execute(sendInlineKeyBoardMessage(chatId,user.getEntities()));
                     }
                 }
@@ -110,7 +119,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         return token;
     }
 
-    public SendMessage sendInlineKeyBoardMessage(String chatId, List<String> ingredientsInfo) {
+    public SendMessage sendInlineKeyBoardMessage(String chatId, List<Ingredient> ingredientsInfo) {
         for (UserIngredients user:users){
             if (user.getChatId().equals(chatId)){
                 user.setEntities(ingredientsInfo);
@@ -118,10 +127,10 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<InlineKeyboardButton> keyboardButtonsRow1 = new ArrayList<>();
-        for (String ingredient : ingredientsInfo) {
+        for (Ingredient ingredient : ingredientsInfo) {
             InlineKeyboardButton temp = new InlineKeyboardButton();
-            temp.setText(ingredient);
-            temp.setCallbackData(ingredient);
+            temp.setText(ingredient.getName());
+            temp.setCallbackData(ingredient.getName());
             keyboardButtonsRow1.add(temp);
         }
 
