@@ -19,9 +19,9 @@ public class ParserManager {
     @SneakyThrows
     public Map<String, List<String>> analyseImage(telegrambotUI.TelegramBot bot, String chatId, BufferedImage input) {
         String recognize = textRecognizer.recognize(input);
-        System.out.println("DBG recognized text:" + recognize);
-        bot.execute(bot.sendInlineKeyBoardMessage(chatId, List.of("чай", "кофе")));
         List<String> entities = entityRecognizer.createEntities(recognize);
+        System.out.println(entities);
+        bot.execute(bot.sendInlineKeyBoardMessage(chatId, entities));
         Map<String, List<String>> analysis = analysisManager.analysis(entities);
         return analysis;
     }

@@ -4,7 +4,6 @@ import lombok.SneakyThrows;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.GetFile;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.*;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -13,21 +12,20 @@ import parsing.ParserManager;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.util.*;
 
 public class TelegramBot extends TelegramLongPollingBot {
     private static final String botUserName = "JavaSchoolTestBot";
     private static final String token = "1993202006:AAFrRNzZwWHn7HeSF8Pp-4DdBr9MfucZFss";
     private ParserManager parserManager = new ParserManager();
+    private List<UserIngredients> users = new ArrayList<UserIngredients>();
     @SneakyThrows
     @Override
     public void onUpdateReceived(Update update) {
-        String chatId = update.getMessage().getChatId().toString();
+
         if (update.hasMessage() && update.getMessage().hasPhoto()) {
-            long chat_id = update.getMessage().getChatId();
+            String chatId = update.getMessage().getChatId().toString();
+            users.add(new UserIngredients(chatId));
 
             java.io.File file = downloadPhotoByFilePath(getFilePath(getPhoto(update)));
 
@@ -35,6 +33,27 @@ public class TelegramBot extends TelegramLongPollingBot {
             execute(new SendMessage(chatId, "Analyzing image..."));
             Map<String, List<String>> strings = parserManager.analyseImage(this, chatId, img);
 
+        }
+        if(update.hasCallbackQuery()){
+            execute(correctIngredient(update.getCallbackQuery().getData().toString(), update.getCallbackQuery().getMessage().getChatId().toString()));
+
+        }
+        if (update.hasMessage() && update.getMessage().hasText()){
+
+            String text = update.getMessage().getText();
+            String chatId = update.getMessage().getChatId().toString();
+            List<String> textList = List.of(text.split("_"));
+            System.out.println(textList.toString());
+            if (textList.size() == 2){
+                for (UserIngredients user : users){
+                    if (user.getChatId().equals(chatId)){
+                        System.out.println(textList.get(1));
+                        user.fixIngredient(textList.get(1));
+                        execute(sendInlineKeyBoardMessage(chatId,user.getEntities()));
+                    }
+                }
+
+            }
         }
     }
 
@@ -91,13 +110,18 @@ public class TelegramBot extends TelegramLongPollingBot {
         return token;
     }
 
-    public static SendMessage sendInlineKeyBoardMessage(String chatId, List<String> ingredientsInfo) {
+    public SendMessage sendInlineKeyBoardMessage(String chatId, List<String> ingredientsInfo) {
+        for (UserIngredients user:users){
+            if (user.getChatId().equals(chatId)){
+                user.setEntities(ingredientsInfo);
+            }
+        }
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
         List<InlineKeyboardButton> keyboardButtonsRow1 = new ArrayList<>();
         for (String ingredient : ingredientsInfo) {
             InlineKeyboardButton temp = new InlineKeyboardButton();
             temp.setText(ingredient);
-            temp.setCallbackData("button pressed");
+            temp.setCallbackData(ingredient);
             keyboardButtonsRow1.add(temp);
         }
 
@@ -107,8 +131,21 @@ public class TelegramBot extends TelegramLongPollingBot {
         inlineKeyboardMarkup.setKeyboard(rowList);
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
-        sendMessage.setText("hello");
+        sendMessage.setText("Проверьте состав вашего продукта");
         sendMessage.setReplyMarkup(inlineKeyboardMarkup);
+        return sendMessage;
+    }
+
+    public SendMessage correctIngredient(String incorrectOne, String chatId){
+        for (UserIngredients user:users){
+            if (user.getChatId().equals(chatId)){
+                user.setIncorrectProduct(incorrectOne);
+            }
+        }
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setText("Введите правильное название продукта в формате correct_названиеПродукта");
+        sendMessage.setChatId(chatId);
         return sendMessage;
     }
 }
