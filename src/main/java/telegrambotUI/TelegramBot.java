@@ -43,11 +43,11 @@ public class TelegramBot extends TelegramLongPollingBot {
             String text = update.getMessage().getText();
             String chatId = update.getMessage().getChatId().toString();
             List<String> textList = List.of(text.split("_"));
-            System.out.println(textList.toString());
+
             if (textList.size() == 2){
                 for (UserIngredients user : users){
                     if (user.getChatId().equals(chatId)){
-                        System.out.println(textList.get(1));
+
                         user.fixIngredient(textList.get(1));
                         execute(sendInlineKeyBoardMessage(chatId,user.getEntities()));
                     }

@@ -15,15 +15,11 @@ public class UserIngredients {
     }
 
     public void fixIngredient(String correctProduct){
-        System.out.println(entities.toString());
-        //System.out.println(incorrectProduct);
+
         if (entities.contains(incorrectProduct)){
             int index = entities.indexOf(incorrectProduct);
-            System.out.println(index);
+
             entities.set(index, correctProduct);
-            //List<String> temp = new ArrayList<String>(entities);
-            //temp.set(index, correctProduct);
-            //entities = temp;
         }
     }
 }

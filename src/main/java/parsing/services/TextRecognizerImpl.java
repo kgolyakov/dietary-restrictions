@@ -17,7 +17,7 @@ public class TextRecognizerImpl implements TextRecognizer {
         Tesseract tesseract = new Tesseract();
         tesseract.setDatapath("C:\\Users\\Xiaomi\\JavaSchoolDB\\tessdata");
         tesseract.setLanguage("rus");
-        System.out.println("Imported tessdata");
+
         File file = new File("downloaded.jpg");
 
         // jpg needs BufferedImage.TYPE_INT_RGB
