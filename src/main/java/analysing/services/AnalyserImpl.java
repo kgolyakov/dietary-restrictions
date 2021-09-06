@@ -1,27 +1,25 @@
 package analysing.services;
 
+import dao.IngredientDAO;
+import model.Restriction;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class AnalyserImpl implements Analyser {
+    @Autowired
+    IngredientDAO ingredientDAO;
+
     @Override
     public Map<String, List<String>> getDietaryRestrictions(List<String> ingredients) {
-        Map<String, List<String>> result = new HashMap<>();
+        Map<String, List<String>> map = new HashMap<>();
         for (String ingredient : ingredients) {
-            if (ingredient.toLowerCase(Locale.ROOT).contains("мясо")) {
-                if (result.containsKey("Meat")) {
-                    result.get("Meat").add(ingredient);
-                } else {
-                    result.put("Meat", new ArrayList<>(List.of(ingredient)));
-                }
-            }
-            if (ingredient.toLowerCase(Locale.ROOT).contains("кофе")) {
-                if (result.containsKey("Coffee")) {
-                    result.get("Coffee").add(ingredient);
-                } else {
-                    result.put("Coffee", new ArrayList<>(List.of(ingredient)));
-                }
-            }
+            map.put(ingredient, ingredientDAO.getRestrictions(ingredientDAO.getIngredient(ingredient))
+                            .stream()
+                            .map(Restriction::getName)
+                            .collect(Collectors.toList()));
         }
-        return result;
+        return map;
     }
 }
