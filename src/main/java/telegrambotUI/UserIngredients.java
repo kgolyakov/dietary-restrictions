@@ -1,20 +1,21 @@
 package telegrambotUI;
 
+import db.Dietary.Ingredient.Ingredient;
 import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
 @Data
 public class UserIngredients {
-    private List<String> entities = new ArrayList<String>();
+    private List<Ingredient> entities = new ArrayList<Ingredient>();
     private String chatId;
-    private String incorrectProduct;
+    private Ingredient incorrectProduct;
 
     public UserIngredients(String chatId){
         this.chatId = chatId;
     }
 
-    public void fixIngredient(String correctProduct){
+    public void fixIngredient(Ingredient correctProduct){
 
         if (entities.contains(incorrectProduct)){
             int index = entities.indexOf(incorrectProduct);

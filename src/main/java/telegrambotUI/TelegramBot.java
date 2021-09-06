@@ -5,6 +5,7 @@ import db.Dietary.Ingredient.IngredientImp;
 import db.Dietary.parsing.ParserManager;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.GetFile;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -17,7 +18,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.util.*;
-
+@Service
 public class TelegramBot extends TelegramLongPollingBot {
     private static final String botUserName = "JavaSchoolTestBot";
     private static final String token = "1993202006:AAFrRNzZwWHn7HeSF8Pp-4DdBr9MfucZFss";
@@ -148,7 +149,7 @@ public class TelegramBot extends TelegramLongPollingBot {
     public SendMessage correctIngredient(String incorrectOne, String chatId){
         for (UserIngredients user:users){
             if (user.getChatId().equals(chatId)){
-                user.setIncorrectProduct(incorrectOne);
+                user.setIncorrectProduct(new IngredientImp(incorrectOne));
             }
         }
 
