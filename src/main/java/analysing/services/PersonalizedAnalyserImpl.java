@@ -2,13 +2,14 @@ package analysing.services;
 
 import dao.IngredientDAO;
 import dao.UserDAO;
-import model.Ingredient;
-import model.Restriction;
+import model.Category;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Service
 public class PersonalizedAnalyserImpl implements PersonalizedAnalyser {
 
     @Autowired
@@ -19,12 +20,11 @@ public class PersonalizedAnalyserImpl implements PersonalizedAnalyser {
 
     @Override
     public Map<String, List<String>> getDietaryRestrictions(List<String> ingredients, long chatId) {
-        Set<Restriction> set = userDAO.getRestrictions(chatId);
+        Set<Category> set = userDAO.getUser(chatId).getCategories();
         Map<String, List<String>> map = new HashMap<>();
         for (String ingredient : ingredients) {
-            Ingredient ingredient1 = ingredientDAO.getIngredient(ingredient);
-            Set<Restriction> restrictions = ingredientDAO.getRestrictions(ingredient1);
-            List<String> collect = restrictions.stream().filter(set::contains).map(Restriction::getName).collect(Collectors.toList());
+            Set<Category> categories = ingredientDAO.getIngredient(ingredient).getCategories();
+            List<String> collect = categories.stream().filter(set::contains).map(Category::getName).collect(Collectors.toList());
             map.put(ingredient, collect);
         }
         return map;

@@ -9,7 +9,9 @@ import java.util.Map;
 
 import analysing.services.PersonalizedAnalyser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class AnalysisManager {
 
     @Autowired

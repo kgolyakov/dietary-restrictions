@@ -1,12 +1,14 @@
 package analysing.services;
 
 import dao.IngredientDAO;
-import model.Restriction;
+import model.Category;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Service
 public class AnalyserImpl implements Analyser {
     @Autowired
     IngredientDAO ingredientDAO;
@@ -15,9 +17,9 @@ public class AnalyserImpl implements Analyser {
     public Map<String, List<String>> getDietaryRestrictions(List<String> ingredients) {
         Map<String, List<String>> map = new HashMap<>();
         for (String ingredient : ingredients) {
-            map.put(ingredient, ingredientDAO.getRestrictions(ingredientDAO.getIngredient(ingredient))
+            map.put(ingredient, ingredientDAO.getIngredient(ingredient).getCategories()
                             .stream()
-                            .map(Restriction::getName)
+                            .map(Category::getName)
                             .collect(Collectors.toList()));
         }
         return map;
